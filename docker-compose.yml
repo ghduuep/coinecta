@@ -1,0 +1,12 @@
+# Use postgres/example user/password credentials
+
+services:
+
+  db:
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: 123@GUIZINHObom
+      POSTGRES_USER: guilherme
+      POSTGRES_DB: financial_db
