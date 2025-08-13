@@ -2,6 +2,8 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { SignInDto } from './dto/sign-in.dto';
+import { SignUpDto } from './dto/sign-up.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -12,9 +14,24 @@ export class AuthService {
 
   async signIn(signInDto: SignInDto): Promise<{ access_token: string }> {
     const user = await this.usersService.findByEmail(signInDto.email);
-    if (user?.password !== signInDto.password) {
-      throw new UnauthorizedException();
+    if (!user) {
+      throw new UnauthorizedException('E-mail ou senha inválidos');
     }
+    const isPasswordValid = await bcrypt.compare(
+      signInDto.password,
+      user.password,
+    );
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('E-mail ou senha inválidos');
+    }
+    const payload = { sub: user.id, email: user.email };
+    return {
+      access_token: await this.jwtService.signAsync(payload),
+    };
+  }
+
+  async signUp(signUpDto: SignUpDto): Promise<{ access_token: string }> {
+    const user = await this.usersService.create(signUpDto);
     const payload = { sub: user.id, email: user.email };
     return {
       access_token: await this.jwtService.signAsync(payload),
