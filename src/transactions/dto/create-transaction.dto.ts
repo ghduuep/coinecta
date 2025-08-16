@@ -8,8 +8,9 @@ export class CreateTransactionDto {
   amount: number;
   @IsOptional()
   description?: string;
+  @IsOptional()
   @IsDateString({}, {message: 'Insira uma data válida.'})
-  date: Date;
+  date?: Date;
   @IsInt({message: 'ID de usuário deve ser um número inteiro.'})
   userId: number;
   @IsOptional()
